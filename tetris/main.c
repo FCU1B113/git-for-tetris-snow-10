@@ -265,6 +265,43 @@ void resetBlock(Block* block)
 	block->current = false;
 }
 
+void printCanvas(Block canvas[CANVAS_HEIGHT][CANVAS_WIDTH], State *state) {
+	printf("\033[0;0H\n");
+	for (int i = 0; i < CANVAS_HEIGHT; i++) {
+		printf("|");
+		for (int j = 0; j < CANVAS_WIDTH; j++) {
+			printf("\033[%dm\u3000", canvas[i][j].color);
+		}
+		printf("\033[0m");
+		printf("|\n");
+	}
+}
+
+bool move(Block canvas[CANVAS_HEIGHT][CANVAS_WIDTH], int originalx, int originaly, int originalRotate, int newX, int newY, int newRotate) {
+	Shape shapeData = shapes[shapeId];
+	int size = shapeData.size;
+
+	for (int i = 0;i < size; i++) {
+		for (int j = 0;j < size; j++) {
+			if (shapeData.rotates[newRotate][i][j]) {
+				if (newX + j < 0 || newX + j >= CANVAS_WIDTH || newY + i < 0 || newY + i >= CANVAS_WIDTH) {
+					return false;
+				}
+
+				if(!canvas[newY + i][newX + j].current && canvas[newY + i][newX + j].shape != EMPTY) {
+					return false;
+				}
+			}
+		}
+	}
+
+	for (int i = 0; i < size; i++) {
+		for (int j = 0; j < size; j++) {
+			if(shapeData.rotates[newRotate][i][j])
+		}
+	}
+}
+
 int main() {
 	srand(time(NULL));
 
@@ -276,9 +313,13 @@ int main() {
 		.falltime = 0,
 	};
 
+	for (int i = 0; i < 4; i++) {
+		state.queue[i] = rand() % 7;
+	}
+
 	Block canvas[CANVAS_HEIGHT][CANVAS_WIDTH];
 
-	for (int i = 0; j < CANVAS_HEIGHT; i++) {
+	for (int i = 0; i < CANVAS_HEIGHT; i++) {
 		for (int j = 0; j < CANVAS_WIDTH; j++) {
 			resetBlock(&canvas[i][j]);
 		}
@@ -294,16 +335,9 @@ int main() {
 		}
 	}
 
-	printf("\033[0;0H\n");
-	for (int i = 0; i < CANVAS_HEIGHT; i++) {
-		printf("|");
-		for (int j = 0; j < CANVAS_WIDTH; j++) {
-			printf("\033[%dm\u3000", canvas[i][j].color);
-		}
-		printf("\033[0m");
-		printf("|\n");
+	while (1) {
+		printCanvas(canvas, &state);
 	}
-
 
 	return 0;
 }
